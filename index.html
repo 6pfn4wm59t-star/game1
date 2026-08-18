@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双人剧本杀 · 雾锁翡翠号</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', 'PingFang SC', system-ui, sans-serif; }
+        body { min-height:100vh; background: radial-gradient(ellipse at 40% 30%, #1a2a3a, #080c14); display:flex; justify-content:center; align-items:center; padding:18px; }
+        .container { max-width:980px; width:100%; background:rgba(12,18,30,0.92); border-radius:48px; padding:30px 28px; box-shadow:0 30px 70px rgba(0,0,0,0.9); border:1px solid rgba(140,190,230,0.08); }
+        h1 { text-align:center; font-weight:300; letter-spacing:6px; font-size:30px; color:#c8e2f0; border-bottom:1px solid #2d4a62; padding-bottom:18px; margin-bottom:10px; }
+        h1 small { display:block; font-size:14px; color:#8cadc9; margin-top:6px; font-weight:300; }
+        h2 { color:#d4e8f0; font-weight:400; font-size:21px; margin:22px 0 16px 0; border-left:6px solid #6a9fc0; padding-left:18px; }
+        .box { background:rgba(24,34,54,0.65); border-radius:24px; padding:20px 24px; margin:16px 0; border:1px solid #3a506a; }
+        .box p { margin:8px 0; line-height:1.8; color:#d0dce8; }
+        .box strong { color:#e8f2f8; }
+        .badge-group { display:flex; flex-wrap:wrap; gap:8px 20px; justify-content:center; margin:4px 0; }
+        .badge { background:#1a2a40; padding:4px 18px; border-radius:40px; font-size:14px; border:1px solid #4a6a88; color:#b8d0e0; }
+        .tip { color:#9ab8d0; font-size:14px; background:#162436; padding:6px 16px; border-radius:40px; display:inline-block; border:1px solid #3a5a78; }
+        .hide { display:none !important; }
+        .btn { display:inline-block; width:100%; padding:14px 0; margin:8px 0; border:none; border-radius:60px; background:linear-gradient(145deg, #2a3d58, #18273e); color:#e8f2f8; font-size:16px; font-weight:500; cursor:pointer; transition:all 0.25s ease; box-shadow:0 6px 0 #0a1422; border:1px solid #4a6a88; }
+        .btn:hover:not(:disabled) { background:linear-gradient(145deg, #3a5a78, #1f3450); transform:translateY(-3px); box-shadow:0 8px 0 #0a1422; }
+        .btn:disabled { opacity:0.35; cursor:not-allowed; transform:scale(0.96); box-shadow:0 3px 0 #0a1422; filter:grayscale(0.6); border-color:#2d4a62; }
+        .btn-role { background:linear-gradient(145deg, #2a4058, #1a2a40); border-color:#4a6a88; padding:13px 0; font-size:15px; color:#e8f2f8; }
+        .btn-gold { background:linear-gradient(145deg, #6a7a4a, #3a4a2a); border-color:#8aaa5a; color:#f4f8e8; box-shadow:0 6px 0 #1a2a12; }
+        .btn-sm { padding:10px 20px; width:auto; display:inline-block; margin:4px 6px 4px 0; }
+        .red { color:#f7aeb8; font-weight:500; }
+        .green { color:#b3e4c0; font-weight:500; }
+        .gold { color:#e8d48a; }
+        .cyan { color:#8ad4e8; }
+        .secret-script { background:#0a1424; border-left:6px solid #8a9a7a; padding:18px 22px; margin:14px 0; border-radius:24px; border:1px solid #3a5a6a; max-height:520px; overflow-y:auto; }
+        .secret-script h3 { color:#d8e0d0; font-weight:400; border-bottom:1px dashed #4a6a7a; padding-bottom:8px; margin-bottom:12px; }
+        .secret-script p { color:#c8d8e0; line-height:1.7; }
+        .secret-script strong { color:#e8f2f8; }
+        .timeline-block { background:#121e30; padding:10px 16px; border-radius:30px; margin:8px 0; font-size:14px; border-left:4px solid #5a7a92; color:#c8d8e0; }
+        .role-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        @media (max-width:600px) { .role-grid { grid-template-columns:1fr; } }
+        .chat-card { background:#0e1a2a; border-radius:16px; padding:16px 20px; margin:12px 0; border-left:4px solid #6a9fc0; }
+        .chat-card .name { color:#8ad4e8; font-weight:600; font-size:16px; }
+        .chat-card .content { color:#c8d8e0; margin-top:6px; line-height:1.7; font-size:14px; }
+        .chat-card .timeline-mini { background:#0a1624; padding:8px 14px; border-radius:12px; margin-top:8px; font-size:13px; border-left:3px solid #4a8a9a; color:#aac8d8; }
+        .question-area { background:#0a1624; border-radius:16px; padding:16px 20px; margin-top:12px; border:1px solid #2a4a5a; }
+        .question-area input, .question-area select { padding:12px 16px; border-radius:40px; border:1px solid #3a5a6a; background:#121e30; color:#e8f2f8; font-size:15px; outline:none; }
+        .question-area input::placeholder { color:#5a7a8a; }
+        .question-area input:focus, .question-area select:focus { border-color:#6a9fc0; box-shadow:0 0 20px #4a7a9f33; }
+        .question-area .btn { width:auto; padding:10px 28px; margin:8px 8px 0 0; display:inline-block; }
+        .response-box { background:#0a1624; border-radius:12px; padding:12px 16px; margin-top:10px; border-left:3px solid #8ad4e8; color:#c8d8e0; font-size:14px; line-height:1.7; min-height:40px; }
+        .flex-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .flex-row select { flex:0 0 160px; color:#e8f2f8; }
+        .flex-row input { flex:1; min-width:150px; color:#e8f2f8; }
+        .footer-note { margin-top:28px; text-align:center; color:#4a6a7a; font-size:13px; border-top:1px solid #1a2a3a; padding-top:18px; }
+        .role-hint { color:#b8d0e0; }
+        @media (max-width:500px) { .container { padding:18px 14px; } h1 { font-size:22px; } .box { padding:16px; } .secret-script { max-height:400px; } .flex-row select { flex:1; } }
+        ::-webkit-scrollbar { width:5px; }
+        ::-webkit-scrollbar-track { background:#0a1422; }
+        ::-webkit-scrollbar-thumb { background:#4a6a82; border-radius:10px; }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <h1>⛵ 雾锁·翡翠号 <small>双人剧本杀 · 人机盘问版</small></h1>
+
+    <!-- STEP 0 -->
+    <div id="step0">
+        <div class="box" style="text-align:center;">
+            <div class="badge-group">
+                <span class="badge">👥 2人</span>
+                <span class="badge">⏳ 50-70min</span>
+                <span class="badge">🎭 四角色可选</span>
+                <span class="badge">💬 人机盘问</span>
+            </div>
+            <p style="margin-top:18px; font-size:16px; color:#d0dce8;">豪华游轮「翡翠号」上，船长离奇死于密室。<br>两位玩家各选一个角色，<strong style="color:#e8f2f8;">可以盘问人机角色</strong>获取线索！<br><span class="red">隐藏杀机与核心秘密</span>，等你来挖掘！</p>
+            <p class="tip" style="margin-top:14px;">📌 角色按钮互斥锁定 · 禁止窥屏 · 可盘问未选择的角色</p>
+        </div>
+        <button class="btn" onclick="nextStep()">🌊 登船 · 开始游戏</button>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="step1" class="hide">
+        <h2>📜 故事背景</h2>
+        <div class="box">
+            <p style="color:#d0dce8;">「翡翠号」是加勒比海域最豪华的游轮。船长老杰克被发现死于反锁的船长室。</p>
+            <p style="margin-top:12px; color:#d0dce8;">四名嫌疑人：</p>
+            <p style="color:#d0dce8;"><strong style="color:#e8f2f8;">⚓ 大副威廉</strong> — 忠诚外表下藏着家族血仇</p>
+            <p style="color:#d0dce8;"><strong style="color:#e8f2f8;">💎 千金艾琳</strong> — 为祖父名誉而来</p>
+            <p style="color:#d0dce8;"><strong style="color:#e8f2f8;">💊 神秘医生</strong> — 与船长有不可告人的交易</p>
+            <p style="color:#d0dce8;"><strong style="color:#e8f2f8;">🌊 水手汤姆</strong> — 年轻热情，身世成谜</p>
+        </div>
+        <button class="btn" onclick="nextStep()">📖 选择角色</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" class="hide">
+        <h2>🎭 选择你的角色</h2>
+        <div class="box" style="display:flex; flex-wrap:wrap; gap:6px 24px; justify-content:center;">
+            <span class="role-hint"><span style="color:#b8d0e0;">玩家1</span> 选一个角色</span>
+            <span class="role-hint"><span style="color:#b8d0e0;">玩家2</span> 选另一个角色</span>
+        </div>
+        <p class="tip">⚠️ 点击按钮查看专属剧本，<span class="red">其他按钮立即禁用</span>。</p>
+        <div class="role-grid">
+            <button id="btnWilliam" class="btn btn-role" onclick="toggleWilliam()">⚓ 大副·威廉</button>
+            <div id="williamScript" class="hide secret-script">
+                <h3>🔒 大副·威廉 · 绝密剧本</h3>
+                <p><strong>🧑‍✈️ 人设</strong>：35岁，服役12年，暗恋艾琳多年。</p>
+                <p><strong>💔 你的秘密</strong>：父亲被船长陷害死于海难。你隐忍多年，本想摊牌。你深爱艾琳，一直在暗中保护她。</p>
+                <div class="timeline-block"><strong>⏳ 时间线</strong><br>20:00 看到艾琳与船长争吵<br>21:00 被船长召见，不欢而散<br>21:30 回舱室取信物<br>22:00 前往船长室，门已反锁<br>22:15 破门发现船长死亡</div>
+                <p><strong>🎯 任务</strong>：隐藏家族恩怨 · 保护艾琳 · 洗清嫌疑。</p>
+            </div>
+            <button id="btnErin" class="btn btn-role" onclick="toggleErin()">💎 千金·艾琳</button>
+            <div id="erinScript" class="hide secret-script">
+                <h3>🔒 千金·艾琳 · 绝密剧本</h3>
+                <p><strong>👩 人设</strong>：26岁，航运世家独女，优雅冷静。</p>
+                <p><strong>💔 你的秘密</strong>：已拍下船长犯罪证据。手中有祖父遗物——古董匕首。已怀孕，孩子是威廉的。</p>
+                <div class="timeline-block"><strong>⏳ 时间线</strong><br>20:00 与船长争吵，他承认阴谋<br>21:00 回舱室整理证据<br>21:45 再次前往船长室，门反锁<br>22:00 返回途中看到威廉<br>22:15 听到破门声赶去</div>
+                <p><strong>🎯 任务</strong>：隐藏匕首与怀孕 · 保护证据 · 试探威廉。</p>
+            </div>
+            <button id="btnDoc" class="btn btn-role" onclick="toggleDoc()">💊 神秘医生</button>
+            <div id="docScript" class="hide secret-script">
+                <h3>🔒 神秘医生 · 绝密剧本</h3>
+                <p><strong>👨‍⚕️ 人设</strong>：40岁，心理医生，与船长是旧识。</p>
+                <p><strong>💔 你的秘密</strong>：曾是船长合伙人，被私吞利润。带着可毁掉船长的医疗报告。爱上了艾琳。</p>
+                <div class="timeline-block"><strong>⏳ 时间线</strong><br>20:15 与船长在医疗室争吵<br>21:00 看到艾琳与船长争吵<br>21:30 带报告去找船长谈判<br>22:00 听到重物倒地声<br>22:10 离开时遇到汤姆</div>
+                <p><strong>🎯 任务</strong>：隐藏医疗报告 · 保护艾琳 · 找出真凶。</p>
+            </div>
+            <button id="btnTom" class="btn btn-role" onclick="toggleTom()">🌊 水手·汤姆</button>
+            <div id="tomScript" class="hide secret-script">
+                <h3>🔒 水手·汤姆 · 绝密剧本</h3>
+                <p><strong>🧑‍🦱 人设</strong>：22岁，年轻水手，暗恋艾琳。</p>
+                <p><strong>💔 你的秘密</strong>：你是船长的私生子。登船为认亲，但船长嘲讽你，由爱生恨。</p>
+                <div class="timeline-block"><strong>⏳ 时间线</strong><br>20:30 甲板巡逻看到艾琳与船长争吵<br>21:15 找船长质问身世被嘲讽<br>21:45 在船舱喝酒看到医生<br>22:00 听到巨响看到威廉进入<br>22:20 看到医生慌张离开</div>
+                <p><strong>🎯 任务</strong>：隐藏身世 · 保护艾琳 · 试探医生。</p>
+            </div>
+        </div>
+        <button class="btn btn-gold" onclick="nextStep()" style="margin-top:12px;">✅ 双方读完，进入公聊盘问</button>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step3" class="hide">
+        <h2>🗣️ 公聊阶段 · 盘问人机角色</h2>
+        <div class="box">
+            <p style="color:#d0dce8;">系统已为你整理其他角色的 <span class="cyan">公开故事与时间线</span>。<br>你可以在下方 <strong style="color:#e8f2f8;">输入问题盘问人机角色</strong>，挖掘更深层的线索！</p>
+            <p class="tip">💡 问题示例："你22:00在哪里？""你和船长什么关系？"</p>
+        </div>
+        <div id="chatArea">
+            <div class="chat-card">
+                <div class="name">🤖 系统 · 可用角色</div>
+                <div class="content" id="chatContent">选择角色后，这里将显示其他角色的公聊介绍...</div>
+            </div>
+        </div>
+        <div class="question-area">
+            <p style="color:#8ad4e8; font-weight:500; margin-bottom:8px;">💬 盘问人机角色</p>
+            <div class="flex-row">
+                <select id="targetSelect"><option value="">选择对象</option></select>
+                <input type="text" id="questionInput" placeholder="输入你的问题..." />
+                <button class="btn btn-sm" onclick="askQuestion()">🔍 盘问</button>
+            </div>
+            <div id="responseBox" class="response-box">💬 选择对象并输入问题，点击盘问获取回答...</div>
+        </div>
+        <button class="btn" onclick="nextStep()" style="margin-top:12px;">🔎 进入搜证推理</button>
+    </div>
+
+    <!-- STEP 4 -->
+    <div id="step4" class="hide">
+        <h2>🔦 阶段二 · 公开线索</h2>
+        <div class="box">
+            <p style="color:#d0dce8;">1. 船长死因：头部遭钝器重击，死亡时间 <strong style="color:#e8d48a;">21:45-22:15</strong>。</p>
+            <p style="color:#d0dce8;">2. 船长室为密室：门锁从内反锁。</p>
+            <p style="color:#d0dce8;">3. 地上有 <span class="gold">破碎的航海罗盘</span>，沾有血迹。</p>
+            <p style="color:#d0dce8;">4. 保险箱被破坏，但翡翠罗盘仍在。</p>
+            <p style="color:#d0dce8;">5. 威廉衣角有 <span class="gold">海图墨迹</span>。</p>
+            <p style="color:#d0dce8;">6. 艾琳手包中有 <span class="gold">泛黄家族合影</span>。</p>
+            <p style="color:#d0dce8;">7. 医生舱室发现 <span class="gold">精神鉴定报告</span>。</p>
+            <p style="color:#d0dce8;">8. 汤姆床下藏有 <span class="gold">未寄出的信</span>。</p>
+        </div>
+        <button class="btn" onclick="nextStep()">🧩 隐藏线索 · 自由盘问</button>
+    </div>
+
+    <!-- STEP 5 -->
+    <div id="step5" class="hide">
+        <h2>⚖️ 阶段三 · 隐藏线索 + 自由盘问</h2>
+        <div class="box">
+            <p style="color:#d0dce8;"><strong style="color:#e6d28c;">🔍 隐藏关键（可盘问得出）</strong></p>
+            <p style="color:#d0dce8;">▪ 地球仪底座有新鲜撞击痕迹，疑似凶器。</p>
+            <p style="color:#d0dce8;">▪ 威廉舱室有未寄出的信，提及"复仇"。</p>
+            <p style="color:#d0dce8;">▪ 艾琳衣袋中有古董匕首，刀柄刻有"J·E"。</p>
+            <p style="color:#d0dce8;">▪ 汤姆日记中写道："我恨他，但我更恨自己流着他的血。"</p>
+        </div>
+        <div class="box">
+            <p style="color:#d0dce8;">🔄 现在你们可以互相提问、对时间线、找破绽。</p>
+            <p class="tip">⏱️ 20分钟 · 爱恨交织，真相需要你们共同打捞。</p>
+        </div>
+        <button class="btn" onclick="nextStep()">🗳️ 推理结束，最终投票</button>
+    </div>
+
+    <!-- STEP 6 -->
+    <div id="step6" class="hide">
+        <h2>🗳️ 阶段四 · 最终投票</h2>
+        <div class="box" style="text-align:center;">
+            <p style="color:#d0dce8;">在心中锁定真凶，确认后一同公布。</p>
+            <p class="red" style="font-size:20px; margin:10px 0;">⚡ 真凶仅一人</p>
+        </div>
+        <button class="btn btn-gold" onclick="nextStep()">📖 公布真相</button>
+    </div>
+
+    <!-- STEP 7 -->
+    <div id="step7" class="hide">
+        <h2>⚡ 真相复盘 · 结局</h2>
+        <div class="box" style="border-left:6px solid #b8a86a;">
+            <p><span class="green" style="font-size:22px;">🔴 真凶：水手·汤姆</span></p>
+            <p style="color:#d0dce8;">汤姆在21:45与船长爆发争吵后，得知自己是被遗弃的私生子，愤怒中举起地球仪底座重击船长头部。随后反锁门窗，从通风管道爬出制造密室。</p>
+        </div>
+        <div class="box">
+            <p style="color:#d0dce8;"><strong style="color:#e8f2f8;">📌 结局</strong></p>
+            <p style="color:#d0dce8;">▪ 威廉 · 清白，与艾琳坦白感情，承担父亲责任。</p>
+            <p style="color:#d0dce8;">▪ 艾琳 · 清白，放下仇恨，与威廉开启新生活。</p>
+            <p style="color:#d0dce8;">▪ 医生 · 清白，自首医疗造假，获得减刑。</p>
+            <p style="color:#d0dce8;">▪ 汤姆 · 因弑父之罪被捕。</p>
+        </div>
+        <button class="btn" onclick="restartGame()">🔄 重新起航</button>
+    </div>
+
+    <div class="footer-note">⛵ 海雾终将散去，而爱与恨，都成为波涛的一部分</div>
+</div>
+
+<script>
+    var currentStep = 0;
+    var selectedRole = null;
+    var stepIds = ["step0","step1","step2","step3","step4","step5","step6","step7"];
+
+    var btnWilliam = document.getElementById('btnWilliam');
+    var btnErin = document.getElementById('btnErin');
+    var btnDoc = document.getElementById('btnDoc');
+    var btnTom = document.getElementById('btnTom');
+
+    var williamScript = document.getElementById('williamScript');
+    var erinScript = document.getElementById('erinScript');
+    var docScript = document.getElementById('docScript');
+    var tomScript = document.getElementById('tomScript');
+
+    var allScripts = [williamScript, erinScript, docScript, tomScript];
+    var allButtons = [btnWilliam, btnErin, btnDoc, btnTom];
+
+    var roleNames = { william:'大副·威廉', erin:'千金·艾琳', doc:'神秘医生', tom:'水手·汤姆' };
+
+    var chatData = {
+        william: { name:'⚓ 大副·威廉', story:'在翡翠号服役12年，是船长最信任的副手。传闻其父死于海难，与艾琳小姐关系暧昧。', timeline:'20:00 目睹艾琳与船长争吵 → 21:00 被船长召见，不欢而散 → 21:30 回舱室取信物 → 22:00 前往船长室发现门已反锁 → 22:15 破门发现船长死亡' },
+        erin: { name:'💎 千金·艾琳', story:'航运世家独女，祖父曾是翡翠号船长，与现任船长有旧怨。随身携带家族遗物。', timeline:'20:00 与船长激烈争吵 → 21:00 回舱室整理证据 → 21:45 再次前往船长室，门反锁 → 22:00 返回途中遇到威廉 → 22:15 听到破门声赶去' },
+        doc: { name:'💊 神秘医生', story:'船上心理医生，与船长相识多年。医疗室内发现多份船长相关记录。', timeline:'20:15 与船长在医疗室争吵 → 21:00 看到艾琳与船长争吵 → 21:30 带报告去找船长谈判 → 22:00 听到重物倒地声 → 22:10 离开时遇到汤姆' },
+        tom: { name:'🌊 水手·汤姆', story:'年轻水手，暗恋艾琳。出身贫寒，近期情绪波动较大，身世另有隐情。', timeline:'20:30 甲板巡逻看到艾琳与船长争吵 → 21:15 找船长质问身世被嘲讽 → 21:45 在船舱喝酒看到医生 → 22:00 听到巨响看到威廉进入 → 22:20 看到医生慌张离开' }
+    };
+
+    var knowledgeBase = {
+        william: {
+            '22:00':'22:00我前往船长室，发现门已经反锁了。我敲了很久没人回应。',
+            '21:00':'21:00船长召见我，指责我工作懈怠，还暗示知道我调查父亲的事。我们吵了一架。',
+            '艾琳':'艾琳是我深爱的人，我一直在暗中保护她。我知道她在调查船长，但我不希望她涉险。',
+            '父亲':'我父亲曾是这艘船的大副，被船长陷害死于海难。我一直在寻找证据。',
+            '罗盘':'那是我们家族的航海罗盘，我父亲留给我的唯一遗物。',
+            'default':'这个问题…我暂时不能回答你。也许你可以换个角度问问。'
+        },
+        erin: {
+            '22:00':'22:00我正从船长室返回，途中看到威廉神色紧张地朝船长室走去。',
+            '21:00':'21:00我回到舱室整理偷拍到的证据，发现船长派人监视我。',
+            '威廉':'威廉…他对我很好，但我总觉得他隐藏着什么。我既欣赏他又怀疑他。',
+            '祖父':'我的祖父曾是这艘船的船长，被老杰克联合其他人篡改船籍，含恨而终。',
+            '匕首':'那是祖父的遗物，我随身携带是为了纪念他。但我从没用它伤害过任何人。',
+            'default':'我理解你的怀疑，但我真的没有杀他。'
+        },
+        doc: {
+            '22:00':'22:00我听到船长室内传来重物倒地的声音，但门是反锁的。',
+            '21:00':'21:00我看到艾琳与船长争吵，我很担心她。',
+            '艾琳':'艾琳是个坚强的女孩，她让我想起了年轻时的自己。我…我对她有好感。',
+            '船长':'我和船长曾经是合伙人，但他背叛了我，吞没了所有利润。我恨他，但我不至于杀他。',
+            '医疗报告':'那份报告显示船长有严重的精神疾病，不适合继续担任船长。我本想用它来谈判。',
+            'default':'我只是个医生，我有自己的原则。'
+        },
+        tom: {
+            '22:00':'22:00我听到船长室传来巨响，然后看到威廉急匆匆地进去了。',
+            '21:15':'21:15我去找船长质问我母亲的事，他嘲讽我是野种，我几乎失控。',
+            '艾琳':'艾琳是我见过最美好的女孩，我愿意为她做任何事。',
+            '父亲':'船长是我的父亲…但他说我是野种，根本不认我。我恨他。',
+            '身世':'我母亲临终前告诉我真相，我登船是为了认亲，但…一切都破灭了。',
+            'default':'我没什么好说的，你们不相信我也没办法。'
+        }
+    };
+
+    function resetAllButtons() {
+        for (var i = 0; i < allButtons.length; i++) {
+            allButtons[i].disabled = false;
+        }
+        for (var j = 0; j < allScripts.length; j++) {
+            allScripts[j].classList.add('hide');
+        }
+        selectedRole = null;
+    }
+
+    function disableAllExcept(exceptBtn) {
+        for (var i = 0; i < allButtons.length; i++) {
+            if (allButtons[i] !== exceptBtn) {
+                allButtons[i].disabled = true;
+            }
+        }
+    }
+
+    function generateChat(roleKey) {
+        var chatContent = document.getElementById('chatContent');
+        var html = '';
+        var keys = Object.keys(chatData);
+        var hasOther = false;
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            if (key !== roleKey) {
+                hasOther = true;
+                var data = chatData[key];
+                html += '<div class="chat-card" style="border-left-color:#8a9a7a; margin-top:10px;">' +
+                    '<div class="name">' + data.name + '</div>' +
+                    '<div class="content">' + data.story + '</div>' +
+                    '<div class="timeline-mini"><strong>⏳ 时间线：</strong>' + data.timeline + '</div>' +
+                    '</div>';
+            }
+        }
+        chatContent.innerHTML = hasOther ? html : '<p style="color:#6a8aaa;">没有其他角色可介绍</p>';
+
+        var select = document.getElementById('targetSelect');
+        select.innerHTML = '<option value="">选择盘问对象</option>';
+        for (var j = 0; j < keys.length; j++) {
+            var key2 = keys[j];
+            if (key2 !== roleKey) {
+                var opt = document.createElement('option');
+                opt.value = key2;
+                opt.textContent = roleNames[key2];
+                select.appendChild(opt);
+            }
+        }
+    }
+
+    function toggleScript(scriptToShow, buttonToKeep, roleKey) {
+        if (!scriptToShow.classList.contains('hide')) {
+            scriptToShow.classList.add('hide');
+            resetAllButtons();
+            return;
+        }
+        for (var i = 0; i < allScripts.length; i++) {
+            allScripts[i].classList.add('hide');
+        }
+        scriptToShow.classList.remove('hide');
+        disableAllExcept(buttonToKeep);
+        buttonToKeep.disabled = false;
+        selectedRole = roleKey;
+    }
+
+    window.toggleWilliam = function() { toggleScript(williamScript, btnWilliam, 'william'); };
+    window.toggleErin = function() { toggleScript(erinScript, btnErin, 'erin'); };
+    window.toggleDoc = function() { toggleScript(docScript, btnDoc, 'doc'); };
+    window.toggleTom = function() { toggleScript(tomScript, btnTom, 'tom'); };
+
+    window.askQuestion = function() {
+        var target = document.getElementById('targetSelect').value;
+        var question = document.getElementById('questionInput').value.trim();
+        var responseBox = document.getElementById('responseBox');
+
+        if (!target) { responseBox.innerHTML = '⚠️ 请先选择一个盘问对象！'; return; }
+        if (!question) { responseBox.innerHTML = '⚠️ 请输入你的问题！'; return; }
+
+        var kb = knowledgeBase[target];
+        var answer = kb['default'] || '这个问题我不太清楚…';
+        for (var key in kb) {
+            if (question.includes(key)) { answer = kb[key]; break; }
+        }
+        responseBox.innerHTML = '💬 <strong style="color:#8ad4e8;">' + roleNames[target] + '</strong> 回答：' + answer;
+    };
+
+    window.nextStep = function() {
+        if (currentStep < stepIds.length - 1) {
+            document.getElementById(stepIds[currentStep]).classList.add('hide');
+            currentStep++;
+            document.getElementById(stepIds[currentStep]).classList.remove('hide');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (stepIds[currentStep] === 'step2') { resetAllButtons(); }
+            if (stepIds[currentStep] === 'step3' && selectedRole) { generateChat(selectedRole); }
+            if (stepIds[currentStep] === 'step3' && !selectedRole) {
+                document.getElementById('chatContent').innerHTML = '<p style="color:#6a8aaa;">请先在角色选择阶段选择一个角色</p>';
+            }
+        }
+    };
+
+    window.restartGame = function() {
+        currentStep = 0;
+        selectedRole = null;
+        for (var i = 0; i < stepIds.length; i++) {
+            document.getElementById(stepIds[i]).classList.add('hide');
+        }
+        document.getElementById('step0').classList.remove('hide');
+        resetAllButtons();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    for (var i = 0; i < stepIds.length; i++) {
+        if (i !== 0) document.getElementById(stepIds[i]).classList.add('hide');
+    }
+    resetAllButtons();
+</script>
+</body>
+</html>
